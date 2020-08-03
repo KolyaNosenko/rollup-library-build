@@ -1,9 +1,9 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
-import filesize from 'rollup-plugin-filesize';
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const commonjs = require('@rollup/plugin-commonjs');
+const { babel } = require('@rollup/plugin-babel');
+const { terser } = require("rollup-plugin-terser");
 
-import pkg from "./package.json";
+const pkg = require('./package.json');
 
 const external = [
   ...Object.keys(pkg.peerDependencies || {}),
@@ -18,25 +18,87 @@ const makeExternalPredicate = externalArr => {
   return id => pattern.test(id);
 }
 
-
-
-module.exports = {
-  input: 'src/index.js',
-  output: {
-    file: 'dist/wallet-manager.cjs.js',
-    format: 'cjs'
+// TODO should need source maps??
+// TODO add cleaning
+module.exports = [
+  // CommonJS
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'dist/rollup-lib.cjs.js',
+      format: 'cjs',
+      indent: false
+    },
+    external: makeExternalPredicate(external),
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      babel({
+        plugins: [
+          ['@babel/plugin-transform-runtime'],
+        ],
+        exclude: 'node_modules/**',
+        babelHelpers: 'runtime',
+      }),
+    ]
   },
-  external: makeExternalPredicate(external),
-  plugins: [
-    resolve(),
-    commonjs(),
-    babel({
-      plugins: [
-        ['@babel/plugin-transform-runtime'],
-      ],
-      exclude: 'node_modules/**',
-      babelHelpers: 'runtime',
-    }),
-    filesize()
-  ]
-}
+  // ES
+  // TODO diff browserslistrc config
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'dist/rollup-lib.es.js',
+      format: 'es'
+    },
+    external: makeExternalPredicate(external),
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      babel({
+        plugins: [
+          ['@babel/plugin-transform-runtime', { useESModules: true }],
+        ],
+        exclude: 'node_modules/**',
+        babelHelpers: 'runtime',
+      }),
+    ]
+  },
+  // UMD
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'dist/rollup-lib.js',
+      format: 'umd',
+      name: 'RollupLib',
+      indent: false,
+    },
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      babel({
+        exclude: 'node_modules/**',
+      }),
+      // replace({
+      //   'process.env.NODE_ENV': JSON.stringify('production'),
+      // }),
+    ]
+  },
+  // UMD minified
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'dist/rollup-lib.min.js',
+      format: 'umd',
+      name: 'RollupLib',
+      indent: false,
+    },
+    plugins: [
+      nodeResolve(),
+      commonjs(),
+      babel({
+        exclude: 'node_modules/**',
+      }),
+      terser(),
+    ]
+  },
+]

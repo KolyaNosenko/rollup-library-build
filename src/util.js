@@ -1,11 +1,5 @@
 import random from 'lodash/random';
 
-class Bye extends G{
-  bye() {
-    return 'Bye';
-  }
-}
-
 const FRUITS = ['🍏', '🍉', '🍇'];
 
 const FAST_FOODS = ['🍔', '🍟', '🍕'];
@@ -21,5 +15,4 @@ export {
   FAST_FOODS,
   randomFruit,
   randomFastFood,
-  Bye
 };
