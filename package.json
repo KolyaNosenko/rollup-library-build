@@ -1,0 +1,29 @@
+{
+  "name": "wallet-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/wallet-manager.cjs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "files": [
+    "/dist"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-transform-runtime": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@rollup/plugin-babel": "^5.1.0",
+    "@rollup/plugin-commonjs": "^14.0.0",
+    "@rollup/plugin-node-resolve": "^8.4.0",
+    "rollup": "^2.23.0",
+    "rollup-plugin-filesize": "^9.0.2"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.10.5",
+    "lodash": "^4.17.19"
+  }
+}
