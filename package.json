@@ -5,12 +5,15 @@
   "main": "dist/rollup-lib.cjs.js",
   "module": "dist/rollup-lib.es.js",
   "unpkg": "dist/rollup-lib.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c"
   },
   "files": [
-    "dist"
+    "dist",
+    "src",
+    "types"
   ],
   "author": "",
   "license": "ISC",
