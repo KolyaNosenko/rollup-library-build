@@ -3,6 +3,7 @@ const commonjs = require('@rollup/plugin-commonjs');
 const { babel } = require('@rollup/plugin-babel');
 const { terser } = require('rollup-plugin-terser');
 const typescript = require('rollup-plugin-typescript2');
+const { eslint } = require('rollup-plugin-eslint');
 
 const pkg = require('./package.json');
 
@@ -11,13 +12,13 @@ const external = [
   ...Object.keys(pkg.dependencies || {}),
 ];
 
-const makeExternalPredicate = externalArr => {
+const makeExternalPredicate = (externalArr) => {
   if (externalArr.length === 0) {
     return () => false;
   }
-  const pattern = new RegExp(`^(${externalArr.join("|")})($|/)`);
-  return id => pattern.test(id);
-}
+  const pattern = new RegExp(`^(${externalArr.join('|')})($|/)`);
+  return (id) => pattern.test(id);
+};
 
 const extensions = ['.ts'];
 const noDeclarationFiles = { compilerOptions: { declaration: false } };
@@ -31,12 +32,15 @@ module.exports = [
     output: {
       file: 'dist/rollup-lib.cjs.js',
       format: 'cjs',
-      indent: false
+      indent: false,
     },
     external: makeExternalPredicate(external), // prevent including node modules
     plugins: [
       nodeResolve(),
       commonjs(),
+      eslint({
+        throwOnError: true,
+      }), // run linter only once
       typescript({
         useTsconfigDeclarationDir: true, // output .d.ts in dir specified inside tsconfig
         clean: true, // wipes out cache on every build
@@ -44,12 +48,10 @@ module.exports = [
       }),
       babel({
         extensions, // required for transpile .ts
-        plugins: [
-          ['@babel/plugin-transform-runtime'],
-        ],
+        plugins: [['@babel/plugin-transform-runtime']],
         babelHelpers: 'runtime',
       }),
-    ]
+    ],
   },
   // ES
   // TODO diff browserslistrc config
@@ -57,7 +59,7 @@ module.exports = [
     input: 'src/index.ts',
     output: {
       file: 'dist/rollup-lib.es.js',
-      format: 'es'
+      format: 'es',
     },
     external: makeExternalPredicate(external),
     plugins: [
@@ -70,12 +72,10 @@ module.exports = [
       }),
       babel({
         extensions,
-        plugins: [
-          ['@babel/plugin-transform-runtime', { useESModules: true }],
-        ],
+        plugins: [['@babel/plugin-transform-runtime', { useESModules: true }]],
         babelHelpers: 'runtime',
       }),
-    ]
+    ],
   },
   // UMD
   {
@@ -101,7 +101,7 @@ module.exports = [
       // replace({
       //   'process.env.NODE_ENV': JSON.stringify('production'),
       // }),
-    ]
+    ],
   },
   // UMD minified
   {
@@ -125,6 +125,6 @@ module.exports = [
         exclude: 'node_modules/**',
       }),
       terser(),
-    ]
+    ],
   },
-]
+];
