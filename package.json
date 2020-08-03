@@ -21,8 +21,11 @@
     "@rollup/plugin-babel": "^5.1.0",
     "@rollup/plugin-commonjs": "^14.0.0",
     "@rollup/plugin-node-resolve": "^8.4.0",
+    "@types/lodash": "^4.14.158",
     "rollup": "^2.23.0",
-    "rollup-plugin-terser": "^6.1.0"
+    "rollup-plugin-terser": "^6.1.0",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "typescript": "^3.9.7"
   },
   "dependencies": {
     "@babel/runtime": "^7.10.5",

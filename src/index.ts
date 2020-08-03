@@ -6,10 +6,10 @@ export class Hi {
  }
 }
 
-export const hi = () => {
+export const hi = (): string => {
   const s = new Hi();
   console.warn(s.hi());
   const i = 'Hello';
   const t = randomFruit();
-  return `${i} World ${t}`
+  return `${i} World ${t}`;
 }

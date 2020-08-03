@@ -1,7 +1,8 @@
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
 const { babel } = require('@rollup/plugin-babel');
-const { terser } = require("rollup-plugin-terser");
+const { terser } = require('rollup-plugin-terser');
+const typescript = require('rollup-plugin-typescript2');
 
 const pkg = require('./package.json');
 
@@ -18,26 +19,34 @@ const makeExternalPredicate = externalArr => {
   return id => pattern.test(id);
 }
 
+const extensions = ['.ts'];
+const noDeclarationFiles = { compilerOptions: { declaration: false } };
+
 // TODO should need source maps??
 // TODO add cleaning
 module.exports = [
   // CommonJS
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
       file: 'dist/rollup-lib.cjs.js',
       format: 'cjs',
       indent: false
     },
-    external: makeExternalPredicate(external),
+    external: makeExternalPredicate(external), // prevent including node modules
     plugins: [
       nodeResolve(),
       commonjs(),
+      typescript({
+        useTsconfigDeclarationDir: true, // output .d.ts in dir specified inside tsconfig
+        clean: true, // wipes out cache on every build
+        typescript: require('typescript'), // prevent version incompatibility with plugin
+      }),
       babel({
+        extensions, // required for transpile .ts
         plugins: [
           ['@babel/plugin-transform-runtime'],
         ],
-        exclude: 'node_modules/**',
         babelHelpers: 'runtime',
       }),
     ]
@@ -45,7 +54,7 @@ module.exports = [
   // ES
   // TODO diff browserslistrc config
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
       file: 'dist/rollup-lib.es.js',
       format: 'es'
@@ -54,18 +63,23 @@ module.exports = [
     plugins: [
       nodeResolve(),
       commonjs(),
+      typescript({
+        tsconfigOverride: noDeclarationFiles, // generate types only once for 'cjs'
+        clean: true, // wipes out cache on every build
+        typescript: require('typescript'), // prevent version incompatibility with plugin
+      }),
       babel({
+        extensions,
         plugins: [
           ['@babel/plugin-transform-runtime', { useESModules: true }],
         ],
-        exclude: 'node_modules/**',
         babelHelpers: 'runtime',
       }),
     ]
   },
   // UMD
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
       file: 'dist/rollup-lib.js',
       format: 'umd',
@@ -75,7 +89,13 @@ module.exports = [
     plugins: [
       nodeResolve(),
       commonjs(),
+      typescript({
+        tsconfigOverride: noDeclarationFiles, // generate types only once for 'cjs'
+        clean: true, // wipes out cache on every build
+        typescript: require('typescript'), // prevent version incompatibility with plugin
+      }),
       babel({
+        extensions,
         exclude: 'node_modules/**',
       }),
       // replace({
@@ -85,7 +105,7 @@ module.exports = [
   },
   // UMD minified
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
       file: 'dist/rollup-lib.min.js',
       format: 'umd',
@@ -95,7 +115,13 @@ module.exports = [
     plugins: [
       nodeResolve(),
       commonjs(),
+      typescript({
+        tsconfigOverride: noDeclarationFiles, // generate types only once for 'cjs'
+        clean: true, // wipes out cache on every build
+        typescript: require('typescript'), // prevent version incompatibility with plugin
+      }),
       babel({
+        extensions,
         exclude: 'node_modules/**',
       }),
       terser(),
