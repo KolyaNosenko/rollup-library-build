@@ -12,9 +12,9 @@
     "lint:fix": "eslint --fix src"
   },
   "files": [
-    "dist",
-    "src",
-    "types"
+    "/dist",
+    "/types",
+    "/src"
   ],
   "author": "",
   "license": "ISC",
