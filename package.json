@@ -7,8 +7,9 @@
   "unpkg": "dist/rollup-lib.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
   },
   "files": [
     "dist",
