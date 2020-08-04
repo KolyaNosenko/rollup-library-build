@@ -23,8 +23,6 @@ const makeExternalPredicate = (externalArr) => {
 const extensions = ['.ts'];
 const noDeclarationFiles = { compilerOptions: { declaration: false } };
 
-// TODO should need source maps??
-// TODO add cleaning
 module.exports = [
   // CommonJS
   {
@@ -47,14 +45,28 @@ module.exports = [
         typescript: require('typescript'), // prevent version incompatibility with plugin
       }),
       babel({
+        configFile: false,
         extensions, // required for transpile .ts
+        // Override babel config for diff targets
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              modules: false,
+              exclude: [
+                'transform-async-to-generator',
+                'transform-regenerator',
+              ],
+              targets: 'maintained node versions',
+            },
+          ],
+        ],
         plugins: [['@babel/plugin-transform-runtime']],
         babelHelpers: 'runtime',
       }),
     ],
   },
   // ES
-  // TODO diff browserslistrc config
   {
     input: 'src/index.ts',
     output: {
@@ -69,11 +81,6 @@ module.exports = [
         tsconfigOverride: noDeclarationFiles, // generate types only once for 'cjs'
         clean: true, // wipes out cache on every build
         typescript: require('typescript'), // prevent version incompatibility with plugin
-      }),
-      babel({
-        extensions,
-        plugins: [['@babel/plugin-transform-runtime', { useESModules: true }]],
-        babelHelpers: 'runtime',
       }),
     ],
   },
